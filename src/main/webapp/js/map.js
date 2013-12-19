@@ -35,17 +35,14 @@ function initMap() {
         new OpenLayers.Control.ScaleLine()
     ]
     layerSwitcher = controls[4]
-    var bounds = new OpenLayers.Bounds(
-            -159.46609000000004,
-    13.306943999999989,
-    144.753833,
-    64.845403
-    );
-    
+    var bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34);
+    var resolutions = [135388.56986486487, 67694.28493243243, 33847.14246621622, 16923.57123310811, 8461.785616554054, 4230.892808277027, 2115.4464041385136, 1057.7232020692568, 528.8616010346284, 264.4308005173142, 132.2154002586571, 66.10770012932855, 33.053850064664275, 16.526925032332137, 8.263462516166069, 4.131731258083034, 2.065865629041517]; 
     var options = {
         controls: controls,
+        resolutions: resolutions,
+        units: "meters",
         maxExtent: bounds,
-        projection: DEFAULT_CIDA_PROJECTION
+        projection: new OpenLayers.Projection(DEFAULT_CIDA_PROJECTION)
     };
     
     map = new OpenLayers.Map('map', options);
@@ -328,16 +325,17 @@ function addProjectLayer(map, title, layerId, show, opacity, displayInSwitcher) 
     var type    = "wms"
     var url     = projectUrl+"wms"
     var params  = {
-            projection: DEFAULT_CIDA_PROJECTION
+            srs: DEFAULT_CIDA_PROJECTION
            }
     
     var options = {}
     
     if (show) {
-	    options = {
-               visibility: show   // initial visibility
-           }
+	    options.visibility = show   // initial visibility
+            options.gutter = 20
+            options.tileSize = OpenLayers.Size(296, 296)
     }
+    
     options.opacity = opacity ?opacity :0.5
     options.displayInLayerSwitcher = isUndefined(displayInSwitcher) ?true :displayInSwitcher // default to showing it
     
