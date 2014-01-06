@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -38,8 +39,10 @@ public class FetcherConfig {
 	List<String>              DATA_VALUES;
 
 	protected String jndiDS = "java:comp/env/jdbc/sedmapDS";
-
-
+	protected String jndiNwisServer = "java:comp/env/jdbc/sedmap/nwisServer";
+        protected String nwisServer;
+        protected final String DEFAULT_NWIS_SERVER = "37.227.232.147";
+        
 	public FetcherConfig() {
 		this(null);
 	}
@@ -53,7 +56,7 @@ public class FetcherConfig {
 
 	// this prevents concurrency issues
 	public FetcherConfig init() {
-		logger.info("Static Fetcher initialization.");
+                logger.info("Static Fetcher initialization.");
 		FIELD_TRANSLATIONS = configFieldTranslaions();
 		FILE_FORMATS       = configFormats();
 		DATA_TABLES        = configTables();
@@ -73,10 +76,30 @@ public class FetcherConfig {
 		if (cols != null) {
 			cols.add(new Column("SAMPLE_COUNT", Types.NUMERIC, 15, false));
 		}
+                loadNwisServer();
 		return this;
 	}
-
-
+        public String getNwisServer(){
+            return this.nwisServer;
+        }
+        protected String loadNwisServer(){
+            String nwisServerName = DEFAULT_NWIS_SERVER;
+            try{
+                Context ctx = this.getContext();
+                nwisServerName = (String) ctx.lookup(this.jndiNwisServer);
+                if(null == nwisServerName || 0 == nwisServerName.length()){
+                    //reset to default
+                    nwisServerName = DEFAULT_NWIS_SERVER;
+                }
+            }
+            catch(NameNotFoundException e){
+                nwisServerName = DEFAULT_NWIS_SERVER;
+            }
+            catch(NamingException e){
+                throw new RuntimeException("Error loading application configuration", e);
+            }
+            return nwisServerName;
+        }
 
 	protected Map<String, String> configFieldTranslaions() {
 		logger.info("Static Fetcher configFieldTranslaions.");

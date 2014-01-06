@@ -40,7 +40,7 @@ public abstract class Fetcher {
 
 	private static final Logger logger = Logger.getLogger(Fetcher.class);
 
-	protected static String NWIS_URL = "http://137.227.232.147/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
+	protected static String NWIS_URL_TEMPLATE = "http://_nwisServerName_/nwis/dv/?format=_format_&sites=_sites_&startDT=_startDate_&endDT=_endDate_&statCd=00003&parameterCd=00060,80154,80155";
 
 	public static FetcherConfig conf;
         public static final int NUM_NWIS_TRIES = 3;
@@ -54,7 +54,7 @@ public abstract class Fetcher {
 	protected Context getContext() throws NamingException {
 		return conf.getContext();
 	}
-
+            
 
 	public abstract Fetcher initJndiJdbcStore(String jndiJdbc) throws IOException;
 
@@ -73,7 +73,8 @@ public abstract class Fetcher {
 		// NWIS offers RDB only that is compatible with sedmap needs
 		Formatter rdb = new RdbFormatter();
 		String format = "rdb";
-		String url = NWIS_URL.replace("_format_", format);
+		String url = NWIS_URL_TEMPLATE.replace("_format_", format);
+                url = url.replace("_nwisServerName_", Fetcher.conf.getNwisServer());
 
 		// extract expressions from the filter we can handle
 		String yr1 = filter.getViewParam("yr1");
