@@ -1,6 +1,7 @@
 package gov.cida.sedmap.data;
 
 import gov.cida.sedmap.io.IoUtils;
+import gov.cida.sedmap.io.util.SessionUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -90,7 +91,7 @@ public class FetcherConfig {
                 if(null == nwisServerName || 0 == nwisServerName.length()){
                     //reset to default
                     nwisServerName = DEFAULT_NWIS_SERVER;
-                }
+        }
             }
             catch(NameNotFoundException e){
                 nwisServerName = DEFAULT_NWIS_SERVER;
